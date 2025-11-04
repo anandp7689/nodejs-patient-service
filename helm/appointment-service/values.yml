@@ -1,0 +1,6 @@
+image:
+  repository: lbglab.azurecr.io/patient-service
+  tag: latest
+
+service:
+  port: 3001

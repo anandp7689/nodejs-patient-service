@@ -60,25 +60,13 @@ jobs:
     steps:
       - uses: actions/checkout@v4
 
+      # ✅ Login to Azure
       - name: Azure Login
         uses: azure/login@v1
         with:
           creds: ${{ secrets.AZURE_CREDENTIALS }}
 
-      - name: Get Runner Public IP
-        id: get-ip
-        run: echo "ip=$(curl -s https://api.ipify.org)" >> $GITHUB_OUTPUT
-
-      - name: Add Runner IP to ACR Firewall
-        run: |
-          az acr network-rule add \
-            --name ${{ secrets.ACR_NAME }} \
-            --ip-address ${{ steps.get-ip.outputs.ip }} \
-            --resource-group ${{ secrets.AZURE_RG }}
-
-      - name: Wait Firewall
-        run: sleep 20
-
+      # ✅ Login to ACR
       - name: Login to ACR
         run: az acr login --name ${{ secrets.ACR_NAME }}
 
@@ -110,12 +98,3 @@ jobs:
 
       - name: Push Appointment Image
         run: docker push ${{ env.REGISTRY }}/${{ env.APPOINT_IMAGE }}:${{ github.sha }}
-
-      # ✅ Cleanup ACR FW rule
-      - name: Remove Runner IP from ACR FW
-        if: always()
-        run: |
-          az acr.network-rule remove \
-            --name ${{ secrets.ACR_NAME }} \
-            --ip-address ${{ steps.get-ip.outputs.ip }} \
-            --resource-group ${{ secrets.AZURE_RG }}

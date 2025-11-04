@@ -1,0 +1,12 @@
+{
+  "name": "patient-service",
+  "version": "1.0.0",
+  "main": "patient.js",
+  "type": "commonjs",
+  "scripts": {
+    "start": "node patient.js"
+  },
+  "dependencies": {
+    "express": "^4.18.2"
+  }
+}

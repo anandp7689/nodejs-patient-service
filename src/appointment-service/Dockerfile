@@ -10,4 +10,4 @@ COPY . .
 ENV PORT=3001
 EXPOSE 3001
 
-CMD ["node", "appoitnment-service.js"]
+CMD ["node", "appointment-service.js"]

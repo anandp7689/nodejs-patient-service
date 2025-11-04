@@ -7,5 +7,5 @@ spec:
     app: patient-service
   ports:
     - name: http
-      port: {{ .Values.service.port }}      # <- Service port (3000)
-      targetPort: {{ .Values.service.port }} # <- Container port (3000)
+      port: 80                # <- Service port exposed inside cluster for Istio
+      targetPort: {{ .Values.service.port }}  # <- Container port (3000)

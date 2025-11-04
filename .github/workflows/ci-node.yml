@@ -1,9 +1,9 @@
 name: CI Build Pipeline (Node Microservices)
 
-on:
-  push:
-    branches:
-      - main   # ✅ ONLY main branch
+# on:
+#   push:
+#     branches:
+#       - main   # ✅ ONLY main branch
 
 permissions:
   contents: write

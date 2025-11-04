@@ -1,12 +1,13 @@
 {
   "name": "appointment-service",
   "version": "1.0.0",
-  "description": "",
-  "main": "appointment-service.js",
+  "main": "appointment.js",
+  "type": "commonjs",
   "scripts": {
-    "test": "echo \"Error: no test specified\" && exit 1"
+    "start": "node appointment.js"
   },
-  "keywords": [],
-  "author": "",
-  "license": "ISC"
+  "dependencies": {
+    "express": "^4.18.2",
+    "axios": "^1.6.0"
+  }
 }

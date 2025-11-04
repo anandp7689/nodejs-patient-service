@@ -11,7 +11,7 @@ spec:
     metadata:
       labels:
         app: patient-service
-        istio.io/rev: asm-1-24
+        sidecar.istio.io/inject: "true"   # ✅ enable Istio sidecar in AKS
     spec:
       containers:
       - name: patient-service

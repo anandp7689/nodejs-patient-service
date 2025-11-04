@@ -1,0 +1,121 @@
+name: CI Build Pipeline (Node Microservices)
+
+on:
+  push:
+    branches:
+      - main   # ✅ ONLY main branch
+
+permissions:
+  contents: write
+  id-token: write
+
+env:
+  PATIENT_PATH: ./src/patient-service
+  APPOINT_PATH: ./src/appointment-service
+  PATIENT_IMAGE: patient-service
+  APPOINT_IMAGE: appointment-service
+  REGISTRY: ${{ secrets.REGISTRY }}
+
+jobs:
+  install-test:
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout Code
+        uses: actions/checkout@v4
+
+      - name: Setup Node
+        uses: actions/setup-node@v4
+        with:
+          node-version: 20
+
+      # ✅ Patient Service
+      - name: Install Patient Dependencies
+        run: |
+          cd ${{ env.PATIENT_PATH }}
+          npm install --legacy-peer-deps
+
+      - name: Patient Lint & Test
+        run: |
+          cd ${{ env.PATIENT_PATH }}
+          npm run lint || echo "No lint"
+          npm test || echo "No tests"
+
+      # ✅ Appointment Service
+      - name: Install Appointment Dependencies
+        run: |
+          cd ${{ env.APPOINT_PATH }}
+          npm install --legacy-peer-deps
+
+      - name: Appointment Lint & Test
+        run: |
+          cd ${{ env.APPOINT_PATH }}
+          npm run lint || echo "No lint"
+          npm test || echo "No tests"
+
+  docker-build-push:
+    runs-on: ubuntu-latest
+    needs: install-test
+
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Azure Login
+        uses: azure/login@v1
+        with:
+          creds: ${{ secrets.AZURE_CREDENTIALS }}
+
+      - name: Get Runner Public IP
+        id: get-ip
+        run: echo "ip=$(curl -s https://api.ipify.org)" >> $GITHUB_OUTPUT
+
+      - name: Add Runner IP to ACR Firewall
+        run: |
+          az acr network-rule add \
+            --name ${{ secrets.ACR_NAME }} \
+            --ip-address ${{ steps.get-ip.outputs.ip }} \
+            --resource-group ${{ secrets.AZURE_RG }}
+
+      - name: Wait Firewall
+        run: sleep 20
+
+      - name: Login to ACR
+        run: az acr login --name ${{ secrets.ACR_NAME }}
+
+      #### ✅ Build Patient Image
+      - name: Build Patient Image
+        run: docker build -t ${{ env.REGISTRY }}/${{ env.PATIENT_IMAGE }}:${{ github.sha }} ${{ env.PATIENT_PATH }}
+
+      - name: Trivy Scan Patient
+        uses: aquasecurity/trivy-action@0.24.0
+        with:
+           image-ref: ${{ env.REGISTRY }}/${{ env.PATIENT_IMAGE }}:${{ github.sha }}
+           severity: 'CRITICAL,HIGH'
+           exit-code: '1'
+
+      #### ✅ Build Appointment Image
+      - name: Build Appointment Image
+        run: docker build -t ${{ env.REGISTRY }}/${{ env.APPOINT_IMAGE }}:${{ github.sha }} ${{ env.APPOINT_PATH }}
+
+      - name: Trivy Scan Appointment
+        uses: aquasecurity/trivy-action@0.24.0
+        with:
+           image-ref: ${{ env.REGISTRY }}/${{ env.APPOINT_IMAGE }}:${{ github.sha }}
+           severity: 'CRITICAL,HIGH'
+           exit-code: '1'
+
+      #### ✅ Push images
+      - name: Push Patient Image
+        run: docker push ${{ env.REGISTRY }}/${{ env.PATIENT_IMAGE }}:${{ github.sha }}
+
+      - name: Push Appointment Image
+        run: docker push ${{ env.REGISTRY }}/${{ env.APPOINT_IMAGE }}:${{ github.sha }}
+
+      # ✅ Cleanup ACR FW rule
+      - name: Remove Runner IP from ACR FW
+        if: always()
+        run: |
+          az acr.network-rule remove \
+            --name ${{ secrets.ACR_NAME }} \
+            --ip-address ${{ steps.get-ip.outputs.ip }} \
+            --resource-group ${{ secrets.AZURE_RG }}

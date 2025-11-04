@@ -30,8 +30,6 @@ jobs:
           --name patient \
           --resource-group ${{ secrets.AZURE_RG }} \
           --image ${{ secrets.REGISTRY }}/patient-service:latest \
-          --ingress external \
-          --target-port 3000 \
           --set-env-vars REDEPLOY=$(date +%s)
 
     # # ✅ Deploy Appointment Service (public)

@@ -1,99 +1,99 @@
-name: CI Build Pipeline (Node Microservices)
+# name: CI Build Pipeline (Node Microservices)
 
-on:
-  push:
-    branches:
-      - main   # ✅ ONLY main branch
+# on:
+#   push:
+#     branches:
+#       - main   # ✅ ONLY main branch
 
-permissions:
-  contents: write
-  id-token: write
+# permissions:
+#   contents: write
+#   id-token: write
 
-env:
-  PATIENT_PATH: ./src/patient-service
-  APPOINT_PATH: ./src/appointment-service
-  PATIENT_IMAGE: patient-service
-  APPOINT_IMAGE: appointment-service
-  REGISTRY: ${{ secrets.REGISTRY }}
+# env:
+#   PATIENT_PATH: ./src/patient-service
+#   APPOINT_PATH: ./src/appointment-service
+#   PATIENT_IMAGE: patient-service
+#   APPOINT_IMAGE: appointment-service
+#   REGISTRY: ${{ secrets.REGISTRY }}
 
-jobs:
-  install-test:
-    runs-on: ubuntu-latest
+# jobs:
+#   install-test:
+#     runs-on: ubuntu-latest
 
-    steps:
-      - name: Checkout Code
-        uses: actions/checkout@v4
+#     steps:
+#       - name: Checkout Code
+#         uses: actions/checkout@v4
 
-      - name: Setup Node
-        uses: actions/setup-node@v4
-        with:
-          node-version: 20
+#       - name: Setup Node
+#         uses: actions/setup-node@v4
+#         with:
+#           node-version: 20
 
-      # ✅ Patient Service
-      - name: Install Patient Dependencies
-        run: |
-          cd ${{ env.PATIENT_PATH }}
-          npm install --legacy-peer-deps
+#       # ✅ Patient Service
+#       - name: Install Patient Dependencies
+#         run: |
+#           cd ${{ env.PATIENT_PATH }}
+#           npm install --legacy-peer-deps
 
-      - name: Patient Lint & Test
-        run: |
-          cd ${{ env.PATIENT_PATH }}
-          npm run lint || echo "No lint"
-          npm test || echo "No tests"
+#       - name: Patient Lint & Test
+#         run: |
+#           cd ${{ env.PATIENT_PATH }}
+#           npm run lint || echo "No lint"
+#           npm test || echo "No tests"
 
-      # ✅ Appointment Service
-      - name: Install Appointment Dependencies
-        run: |
-          cd ${{ env.APPOINT_PATH }}
-          npm install --legacy-peer-deps
+#       # ✅ Appointment Service
+#       - name: Install Appointment Dependencies
+#         run: |
+#           cd ${{ env.APPOINT_PATH }}
+#           npm install --legacy-peer-deps
 
-      - name: Appointment Lint & Test
-        run: |
-          cd ${{ env.APPOINT_PATH }}
-          npm run lint || echo "No lint"
-          npm test || echo "No tests"
+#       - name: Appointment Lint & Test
+#         run: |
+#           cd ${{ env.APPOINT_PATH }}
+#           npm run lint || echo "No lint"
+#           npm test || echo "No tests"
 
-  docker-build-push:
-    runs-on: ubuntu-latest
-    needs: install-test
+#   docker-build-push:
+#     runs-on: ubuntu-latest
+#     needs: install-test
 
-    steps:
-      - uses: actions/checkout@v4
+#     steps:
+#       - uses: actions/checkout@v4
 
-      # ✅ Login to Azure
-      - name: Azure Login
-        uses: azure/login@v1
-        with:
-          creds: ${{ secrets.AZURE_CREDENTIALS }}
+#       # ✅ Login to Azure
+#       - name: Azure Login
+#         uses: azure/login@v1
+#         with:
+#           creds: ${{ secrets.AZURE_CREDENTIALS }}
 
-      # ✅ Login to ACR
-      - name: Login to ACR
-        run: az acr login --name ${{ secrets.ACR_NAME }}
+#       # ✅ Login to ACR
+#       - name: Login to ACR
+#         run: az acr login --name ${{ secrets.ACR_NAME }}
 
-      #### ✅ Build Patient Image (SHA + latest)
-      - name: Build Patient Image
-        run: |
-          docker build \
-            -t ${{ env.REGISTRY }}/${{ env.PATIENT_IMAGE }}:${{ github.sha }} \
-            -t ${{ env.REGISTRY }}/${{ env.PATIENT_IMAGE }}:latest \
-            ${{ env.PATIENT_PATH }}
+#       #### ✅ Build Patient Image (SHA + latest)
+#       - name: Build Patient Image
+#         run: |
+#           docker build \
+#             -t ${{ env.REGISTRY }}/${{ env.PATIENT_IMAGE }}:${{ github.sha }} \
+#             -t ${{ env.REGISTRY }}/${{ env.PATIENT_IMAGE }}:latest \
+#             ${{ env.PATIENT_PATH }}
 
-      #### ✅ Build Appointment Image (SHA + latest)
-      - name: Build Appointment Image
-        run: |
-          docker build \
-            -t ${{ env.REGISTRY }}/${{ env.APPOINT_IMAGE }}:${{ github.sha }} \
-            -t ${{ env.REGISTRY }}/${{ env.APPOINT_IMAGE }}:latest \
-            ${{ env.APPOINT_PATH }}
+#       #### ✅ Build Appointment Image (SHA + latest)
+#       - name: Build Appointment Image
+#         run: |
+#           docker build \
+#             -t ${{ env.REGISTRY }}/${{ env.APPOINT_IMAGE }}:${{ github.sha }} \
+#             -t ${{ env.REGISTRY }}/${{ env.APPOINT_IMAGE }}:latest \
+#             ${{ env.APPOINT_PATH }}
 
-      #### ✅ Push Patient Image
-      - name: Push Patient Image
-        run: |
-          docker push ${{ env.REGISTRY }}/${{ env.PATIENT_IMAGE }}:${{ github.sha }}
-          docker push ${{ env.REGISTRY }}/${{ env.PATIENT_IMAGE }}:latest
+#       #### ✅ Push Patient Image
+#       - name: Push Patient Image
+#         run: |
+#           docker push ${{ env.REGISTRY }}/${{ env.PATIENT_IMAGE }}:${{ github.sha }}
+#           docker push ${{ env.REGISTRY }}/${{ env.PATIENT_IMAGE }}:latest
 
-      #### ✅ Push Appointment Image
-      - name: Push Appointment Image
-        run: |
-          docker push ${{ env.REGISTRY }}/${{ env.APPOINT_IMAGE }}:${{ github.sha }}
-          docker push ${{ env.REGISTRY }}/${{ env.APPOINT_IMAGE }}:latest
+#       #### ✅ Push Appointment Image
+#       - name: Push Appointment Image
+#         run: |
+#           docker push ${{ env.REGISTRY }}/${{ env.APPOINT_IMAGE }}:${{ github.sha }}
+#           docker push ${{ env.REGISTRY }}/${{ env.APPOINT_IMAGE }}:latest

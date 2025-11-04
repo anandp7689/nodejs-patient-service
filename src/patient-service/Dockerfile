@@ -10,4 +10,4 @@ COPY . .
 ENV PORT=3000
 EXPOSE 3000
 
-CMD ["node", "src/patient-service/patient.js"]
+CMD ["node", "patient-service.js"]

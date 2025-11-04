@@ -32,13 +32,11 @@ jobs:
           --image ${{ secrets.REGISTRY }}/patient-service:latest \
           --set-env-vars REDEPLOY=$(date +%s)
 
-    # # ✅ Deploy Appointment Service (public)
-    # - name: Deploy Appointment Service
-    #   run: |
-    #     az containerapp update \
-    #       --name appointment-app \
-    #       --resource-group ${{ secrets.AZURE_RG }} \
-    #       --image ${{ secrets.REGISTRY }}/appointment-service:latest \
-    #       --ingress external \
-    #       --target-port 3001 \
-    #       --set-env-vars REDEPLOY=$(date +%s)
+    # ✅ Deploy Appointment Service (public)
+    - name: Deploy Appointment Service
+      run: |
+        az containerapp update \
+          --name appointment \
+          --resource-group ${{ secrets.AZURE_RG }} \
+          --image ${{ secrets.REGISTRY }}/appointment-service:latest \
+          --set-env-vars REDEPLOY=$(date +%s)

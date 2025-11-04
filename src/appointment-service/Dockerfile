@@ -1,4 +1,4 @@
-FROM node:18-alpine
+FROM node:20-slim
 
 WORKDIR /app
 
@@ -7,7 +7,7 @@ RUN npm install --production
 
 COPY . .
 
-ENV PORT=3001
-EXPOSE 3001
+ENV PORT=3000
+EXPOSE 3000
 
-CMD ["node", "appointment.js"]
+CMD ["node", "appoitnment-service.js"]

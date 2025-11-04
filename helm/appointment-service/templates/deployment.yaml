@@ -1,20 +1,18 @@
 apiVersion: apps/v1
 kind: Deployment
 metadata:
-  name: patient-service
+  name: appointment-service
 spec:
-  replicas: 1
   selector:
     matchLabels:
-      app: patient-service
+      app: appointment-service
   template:
     metadata:
       labels:
-        app: patient-service
-        istio.io/rev: asm-1-24
+        app: appointment-service
     spec:
       containers:
-      - name: patient-service
+      - name: appointment-service
         image: "{{ .Values.image.repository }}:{{ .Values.image.tag }}"
         ports:
-        - containerPort: {{ .Values.service.port }}
+        - containerPort: 3001

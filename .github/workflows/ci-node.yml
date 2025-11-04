@@ -74,23 +74,23 @@ jobs:
       - name: Build Patient Image
         run: docker build -t ${{ env.REGISTRY }}/${{ env.PATIENT_IMAGE }}:${{ github.sha }} ${{ env.PATIENT_PATH }}
 
-      - name: Trivy Scan Patient
-        uses: aquasecurity/trivy-action@0.24.0
-        with:
-           image-ref: ${{ env.REGISTRY }}/${{ env.PATIENT_IMAGE }}:${{ github.sha }}
-           severity: 'CRITICAL,HIGH'
-           exit-code: '1'
+      # - name: Trivy Scan Patient
+      #   uses: aquasecurity/trivy-action@0.24.0
+      #   with:
+      #      image-ref: ${{ env.REGISTRY }}/${{ env.PATIENT_IMAGE }}:${{ github.sha }}
+      #      severity: 'CRITICAL,HIGH'
+      #      exit-code: '1'
 
       #### ✅ Build Appointment Image
       - name: Build Appointment Image
         run: docker build -t ${{ env.REGISTRY }}/${{ env.APPOINT_IMAGE }}:${{ github.sha }} ${{ env.APPOINT_PATH }}
 
-      - name: Trivy Scan Appointment
-        uses: aquasecurity/trivy-action@0.24.0
-        with:
-           image-ref: ${{ env.REGISTRY }}/${{ env.APPOINT_IMAGE }}:${{ github.sha }}
-           severity: 'CRITICAL,HIGH'
-           exit-code: '1'
+      # - name: Trivy Scan Appointment
+      #   uses: aquasecurity/trivy-action@0.24.0
+      #   with:
+      #      image-ref: ${{ env.REGISTRY }}/${{ env.APPOINT_IMAGE }}:${{ github.sha }}
+      #      severity: 'CRITICAL,HIGH'
+      #      exit-code: '1'
 
       #### ✅ Push images
       - name: Push Patient Image

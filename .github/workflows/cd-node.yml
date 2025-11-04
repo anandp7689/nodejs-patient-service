@@ -27,20 +27,20 @@ jobs:
     - name: Deploy Patient Service
       run: |
         az containerapp update \
-          --name patient-app \
+          --name patient \
           --resource-group ${{ secrets.AZURE_RG }} \
           --image ${{ secrets.REGISTRY }}/patient-service:latest \
           --ingress external \
           --target-port 3000 \
           --set-env-vars REDEPLOY=$(date +%s)
 
-    # ✅ Deploy Appointment Service (public)
-    - name: Deploy Appointment Service
-      run: |
-        az containerapp update \
-          --name appointment-app \
-          --resource-group ${{ secrets.AZURE_RG }} \
-          --image ${{ secrets.REGISTRY }}/appointment-service:latest \
-          --ingress external \
-          --target-port 3001 \
-          --set-env-vars REDEPLOY=$(date +%s)
+    # # ✅ Deploy Appointment Service (public)
+    # - name: Deploy Appointment Service
+    #   run: |
+    #     az containerapp update \
+    #       --name appointment-app \
+    #       --resource-group ${{ secrets.AZURE_RG }} \
+    #       --image ${{ secrets.REGISTRY }}/appointment-service:latest \
+    #       --ingress external \
+    #       --target-port 3001 \
+    #       --set-env-vars REDEPLOY=$(date +%s)

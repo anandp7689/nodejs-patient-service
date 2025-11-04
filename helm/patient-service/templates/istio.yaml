@@ -31,4 +31,4 @@ spec:
     - destination:
         host: patient-service
         port:
-          number: 3000   # ✅ Must match app/service port
+          number: 80   # ✅ Must match Service port, not container port

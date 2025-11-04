@@ -1,27 +1,24 @@
 name: CD Deploy Pipeline (Node Microservices - AKS + Helm)
 
 on:
-  workflow_run:
-    workflows: ["CI Build Pipeline (Node Microservices)"]
-    types:
-      - completed
+  push:
+    branches:
+      - main
+  workflow_dispatch:
 
 jobs:
   deploy-to-aks:
-    if: ${{ github.event.workflow_run.conclusion == 'success' }}
     runs-on: ubuntu-latest
 
     steps:
     - name: Checkout Code
       uses: actions/checkout@v4
 
-    # ✅ Login to Azure
     - name: Azure Login
       uses: azure/login@v2
       with:
         creds: ${{ secrets.AZURE_CREDENTIALS }}
 
-    # ✅ Get AKS Credentials
     - name: Get AKS Credentials
       run: |
         az aks get-credentials \
@@ -29,11 +26,10 @@ jobs:
           --name ${{ secrets.AKS_NAME }} \
           --overwrite-existing
 
-    # ✅ Helm install (if not installed)
     - name: Install Helm
-      run: sudo snap install helm --classic
+      run: |
+        curl https://raw.githubusercontent.com/helm/helm/main/scripts/get-helm-3 | bash
 
-    # ✅ Deploy patient-service via Helm
     - name: Deploy Patient Service with Helm
       run: |
         helm upgrade --install patient-service ./helm/patient-service \
@@ -41,7 +37,6 @@ jobs:
           --set image.tag=latest \
           --set service.port=3000
 
-    # ✅ Deploy appointment-service via Helm
     - name: Deploy Appointment Service with Helm
       run: |
         helm upgrade --install appointment-service ./helm/appointment-service \

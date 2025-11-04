@@ -94,9 +94,11 @@ jobs:
 
       #### ✅ Push images
       - name: Push Patient Image
-        run: docker push ${{ env.REGISTRY }}/${{ env.PATIENT_IMAGE }}:${{ github.sha }}
-             docker push ${{ env.REGISTRY }}/${{ env.PATIENT_IMAGE }}:latest
+        run: |
+          docker push ${{ env.REGISTRY }}/${{ env.PATIENT_IMAGE }}:${{ github.sha }}
+          docker push ${{ env.REGISTRY }}/${{ env.PATIENT_IMAGE }}:latest
 
       - name: Push Appointment Image
-        run: docker push ${{ env.REGISTRY }}/${{ env.APPOINT_IMAGE }}:${{ github.sha }}
-             docker push ${{ env.REGISTRY }}/${{ env.APPOINT_IMAGE }}:latest
+        run: |
+          docker push ${{ env.REGISTRY }}/${{ env.APPOINT_IMAGE }}:${{ github.sha }}
+          docker push ${{ env.REGISTRY }}/${{ env.APPOINT_IMAGE }}:latest

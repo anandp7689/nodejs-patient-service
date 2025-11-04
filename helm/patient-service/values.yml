@@ -1,0 +1,6 @@
+image:
+  repository: <ACR_NAME>.azurecr.io/patient-service
+  tag: latest
+
+service:
+  port: 3000

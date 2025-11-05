@@ -6,5 +6,5 @@ spec:
   selector:
     app: appointment-service
   ports:
-    - port: 3001
+    - port: 80
       targetPort: 3001

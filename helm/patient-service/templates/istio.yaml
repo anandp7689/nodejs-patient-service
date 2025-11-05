@@ -4,7 +4,7 @@ metadata:
   name: patient-gateway
 spec:
   selector:
-    istio: aks-istio-ingressgateway
+    istio: aks-istio-ingressgateway-external
   servers:
   - port:
       number: 80
